@@ -7,7 +7,7 @@
     "echo": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "echo `date`"
+        "command": "echo `date` "
       }
     },
     "build": {
