@@ -1,0 +1,143 @@
+{
+  "name": "shorturl",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/shorturl/src",
+  "targets": {
+    "echo": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo `date`"
+      }
+    },
+    "build": {
+      "executor": "@nrwl/webpack:webpack",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/shorturl",
+        "main": "apps/shorturl/src/main.ts",
+        "tsConfig": "apps/shorturl/tsconfig.app.json",
+        "target": "node",
+        "compiler": "tsc"
+      }
+    },
+    "build-sls": {
+      "executor": "@nrwl/webpack:webpack",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/shorturl",
+        "main": "apps/shorturl/src/lambda.ts",
+        "target": "node",
+        "compiler": "tsc",
+        "sourceMap": true,
+        "optimization": true,
+        "tsConfig": "apps/shorturl/tsconfig.app.json",
+        "progress": true,
+        "externalDependencies": [
+          "cache-manager",
+          "class-validator",
+          "class-transformer",
+          "@nestjs/websockets/socket-module",
+          "@nestjs/microservices",
+          "@nestjs/microservices/microservices-module"
+        ]
+      }
+    },
+    "serve": {
+      "executor": "@nrwl/node:node",
+      "options": {
+        "buildTarget": "shorturl:build"
+      }
+    },
+    "deploy-sls": {
+      "executor": "nx:run-commands",
+      "outputs": ["{workspaceRoot}/.serverless/shorturl"],
+      "options": {
+        "cwd": "apps/shorturl",
+        "command": "TS_NODE_PROJECT=./tsconfig.app.json sls deploy --stage={args.stage}",
+        "color": true,
+        "args": "--stage=sandbox"
+      },
+      "defaultConfiguration": "local",
+      "dependsOn": [
+        {
+          "projects": "self",
+          "target": "build-sls"
+        },
+        {
+          "projects": "dependencies",
+          "target": "deploy"
+        }
+      ],
+      "configurations": {
+        "local": {
+          "args": "--stage=local"
+        },
+        "sandbox": {
+          "args": "--stage=sandbox"
+        },
+        "dev": {
+          "args": "--stage=dev"
+        },
+        "staging": {
+          "args": "--stage=staging"
+        },
+        "production": {
+          "args": "--stage=production"
+        }
+      }
+    },
+    "destroy-sls": {
+      "executor": "nx:run-commands",
+      "outputs": ["{workspaceRoot}/.serverless/shorturl'"],
+      "defaultConfiguration": "local",
+      "options": {
+        "cwd": "apps/shorturl",
+        "command": "TS_NODE_PROJECT=./tsconfig.app.json sls remove --stage={args.stage}",
+        "color": true,
+        "args": "--stage=local"
+      },
+      "configurations": {
+        "local": {
+          "args": "--stage=local"
+        },
+        "sandbox": {
+          "args": "--stage=sandbox"
+        },
+        "dev": {
+          "args": "--stage=dev"
+        },
+        "staging": {
+          "args": "--stage=staging"
+        },
+        "production": {
+          "args": "--stage=production"
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/shorturl/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/apps/shorturl"],
+      "options": {
+        "jestConfig": "apps/shorturl/jest.config.ts",
+        "passWithNoTests": true
+      }
+    },
+    "version": {
+      "executor": "@jscutlery/semver:version",
+      "options": {
+        "baseBranch": "master",
+        "preset": "conventional"
+      }
+    }
+  },
+  "tags": [],
+  "implicitDependencies": []
+}
