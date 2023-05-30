@@ -1,6 +1,8 @@
 name: Run unit test
 
-on: push
+on:
+  - push
+  - pull_request
 
 jobs:
   unittest:
@@ -19,9 +21,7 @@ jobs:
         run: npm install
 
       - name: Run test
-        run: |
-          npm run test
-          npm run test:cov
+        run: npm run test:cov
 
       - name: Upload coverage reports to Codecov with GitHub Action
         uses: codecov/codecov-action@v3
