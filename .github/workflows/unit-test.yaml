@@ -1,0 +1,22 @@
+name: Run unit test
+
+on: push
+
+jobs:
+  unittest:
+    runs-on: ubuntu-latest
+    name: Test
+    steps:
+      - name: Check out git repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Run test
+        run: npm run test:cov
+
+      - name: Upload coverage reports to Codecov with GitHub Action
+        uses: codecov/codecov-action@v3
