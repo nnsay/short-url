@@ -4,7 +4,7 @@ on:
   - push
 
 jobs:
-  unittest:
+  codecov:
     runs-on: ubuntu-latest
     name: Test
     steps:
